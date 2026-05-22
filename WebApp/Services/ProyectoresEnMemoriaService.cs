@@ -1,26 +1,24 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using System.Xml;
-using WebApp.Services;
-using WebApp.Models;
+﻿using WebApp.Models;
 
-namespace WebApp.Controllers
+namespace WebApp.Services
 {
-    public class HomeController : Controller
+    public class ProyectoresEnMemoriaService : IProyectoresService
     {
-        private IProyectoresService _service;
-        public HomeController()
+        private static List<Proyector> _proyectores = LoadData();
+        public void AddProyector(Proyector proyector)
         {
-            _service = new ProyectoresEnMemoriaService();
-
-        }
-        public IActionResult Index()
-        {
-            var modelo = _service.GetAll();
-            return View(modelo);
+            if (proyector != null)
+            {
+                _proyectores.Add(proyector);
+            }
         }
 
-        private IEnumerable<Proyector> LoadData()
+        public IEnumerable<Proyector> GetAll()
+        {
+            return _proyectores;
+        }
+
+        private static List<Proyector> LoadData()
         {
             var proyectores = new List<Proyector>();
             {
@@ -28,7 +26,7 @@ namespace WebApp.Controllers
                 {
                     Id = 1,
                     Marca = "Epson",
-                    Modelo = "Ecotank",
+                    Modelo = " Ecotank",
                     NumeroDeSerie = "382901",
                     Situacion = SituacionProyector.Bueno,
                     FechaDeAlta = DateTime.Now
@@ -74,30 +72,5 @@ namespace WebApp.Controllers
 
         }
 
-        public IActionResult Create()
-        {
-            Proyector proyector = new Proyector();
-            proyector.FechaDeAlta = DateTime.Now;
-
-            return View(proyector);
-        }
-
-        [HttpPost]
-        public IActionResult Create(Proyector proyector)
-        {
-            _service.AddProyector(proyector);
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
